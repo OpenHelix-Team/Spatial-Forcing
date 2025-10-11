@@ -37,7 +37,7 @@ pip install packaging ninja
 ninja --version; echo $?  # Verify Ninja --> should return exit code "0"
 pip install "flash-attn==2.5.5" --no-build-isolation
 ```
-- If you are uncertain about the version of a dependency, please ref to our [**complete envs list**](../envs_list.txt).
+- If you are uncertain about the version of a dependency, please ref to our [**complete envs list**](envs_list.txt).
 
 
 ### Data Preparation
@@ -116,7 +116,7 @@ Notes:
 
 
 ### Training
-First, download the LIBERO datasets as mentioned in the [data preparation section](../docs/data_preparation.md): `libero_spatial_no_noops`, `libero_object_no_noops`, `libero_goal_no_noops`, `libero_10_no_noops`. (`"_no_noops"` stands for no no-op actions, i.e., training samples with near-zero actions are filtered out).
+First, be sure you have downloaded the LIBERO datasets, as mentioned in the [Data Preparation Section](#data-preparation): `libero_spatial_no_noops`, `libero_object_no_noops`, `libero_goal_no_noops`, `libero_10_no_noops`. (`"_no_noops"` stands for no no-op actions, i.e., training samples with near-zero actions are filtered out).
 
 Then, download the [OpenVLA](https://huggingface.co/openvla/openvla-7b/tree/main) and [VGGT](https://huggingface.co/facebook/VGGT-1B/blob/main/model.pt) foundation models and place them in the `./ckpts/` folder. The directory structure is as below:
 ```
