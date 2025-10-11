@@ -3,6 +3,12 @@
 
 [![Paper](https://img.shields.io/badge/Paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/pdf/2509.09372) [![Page](https://img.shields.io/badge/Project--Page-blue?style=for-the-badge&logo=homepage&logoColor=white)](https://hhhjb.github.io/spatial-forcing/) [![Hugging Face Collection](https://img.shields.io/badge/Models-fcd022?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/collections/haofuly/spatial-forcing-68ea1bf0f1ac2c60e2ec6caa)
 
+## 🔥 TODO List
+- [x] Training and inference code on LIBERO (Base model: OpenVLA)
+- [x] Checkpoints on LIBERO (Base model: OpenVLA)
+- [ ] Deployment code in the real world
+- [ ] Code and checkpoints on RoboTwin (Base model: Pi_0)
+
 </div>
 <!-- TODO 替换掉论文的链接 -->
 
@@ -168,13 +174,6 @@ torchrun --standalone --nnodes 1 --nproc-per-node X vla-scripts/finetune_align.p
 The above training command should reproduce our Spatial-Forcing results if `X = 8` and the 150K step checkpoint is evaluated.
 
 Please be sure to test your policy with the same device/GPU used to train it! Otherwise, performance may drop substantially. You may be able to avoid the performance drop if you merge the LoRA weights into the base model on the downstream device used for testing (e.g., if you train on H100 and then merge on A100 before testing on A100). You can see our script [vla-scripts/merge_lora_weights_and_save.py](vla-scripts/merge_lora_weights_and_save.py) for merging the LoRA adapter into the base model offline. It's okay if you already merged LoRA weights into the base OpenVLA model during fine-tuning; you can always redownload the base model and merge again as long as you still have the LoRA adapter (`merge_lora_weights_and_save.py` will handle this for you).
-
-
-## 🔥 Currently Supported Features
-- [x] Training and inference code on LIBERO
-- [x] Checkpoints on LIBERO
-- [ ] Deployment code
-- [ ] Code and checkpoints on RoboTwin
 
 
 ## 🌏 Contact
