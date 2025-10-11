@@ -75,9 +75,9 @@ sagemaker = [
 ]
 
 [project.urls]
-homepage = "https://github.com/moojink/openvla-oft"
-repository = "https://github.com/moojink/openvla-oft"
-documentation = "https://github.com/moojink/openvla-oft"
+homepage = "https://github.com/OpenHelix-Team/Spatial-Forcing"
+repository = "https://github.com/OpenHelix-Team/Spatial-Forcing"
+documentation = "https://github.com/OpenHelix-Team/Spatial-Forcing"
 
 [tool.setuptools.packages.find]
 where = ["."]
