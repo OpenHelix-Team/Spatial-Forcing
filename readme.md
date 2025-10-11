@@ -25,8 +25,8 @@ Please follow our documentation step by step.
 ## 🔥 Currently Supported Features
 - [x] Training and inference code on LIBERO
 - [x] Checkpoints on LIBERO
-- [] Deployment code
-- [] Code and checkpoints on RoboTwin
+- [ ] Deployment code
+- [ ] Code and checkpoints on RoboTwin
 
 
 ## 🌏 Contact
