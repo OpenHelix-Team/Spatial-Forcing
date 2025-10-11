@@ -93,6 +93,6 @@ torchrun --standalone --nnodes 1 --nproc-per-node X vla-scripts/finetune_align.p
   --run_id_override "YOUR_RUN_ID"
 ```
 
-The above training command should reproduce our OpenVLA-OFT results if `X = 8` and the 150K step checkpoint is evaluated.
+The above training command should reproduce our Spatial-Forcing results if `X = 8` and the 150K step checkpoint is evaluated.
 
 Please be sure to test your policy with the same device/GPU used to train it! Otherwise, performance may drop substantially. You may be able to avoid the performance drop if you merge the LoRA weights into the base model on the downstream device used for testing (e.g., if you train on H100 and then merge on A100 before testing on A100). You can see our script [vla-scripts/merge_lora_weights_and_save.py](vla-scripts/merge_lora_weights_and_save.py) for merging the LoRA adapter into the base model offline. It's okay if you already merged LoRA weights into the base OpenVLA model during fine-tuning; you can always redownload the base model and merge again as long as you still have the LoRA adapter (`merge_lora_weights_and_save.py` will handle this for you).

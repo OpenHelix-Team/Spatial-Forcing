@@ -245,7 +245,6 @@ openjpeg                     2.5.2
 openssl                      3.0.16
 opentsne                     1.0.2
 openvla                      0.0.3
-openvla-oft                  0.0.1
 opt-einsum                   3.4.0
 orjson                       3.11.1
 packaging                    24.2
