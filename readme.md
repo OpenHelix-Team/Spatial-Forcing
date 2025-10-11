@@ -3,12 +3,6 @@
 
 [![Paper](https://img.shields.io/badge/Paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/pdf/2509.09372) [![Page](https://img.shields.io/badge/Project--Page-blue?style=for-the-badge&logo=homepage&logoColor=white)](https://hhhjb.github.io/spatial-forcing/) [![Hugging Face Collection](https://img.shields.io/badge/Models-fcd022?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/collections/haofuly/spatial-forcing-68ea1bf0f1ac2c60e2ec6caa)
 
-## 🔥 TODO List
-- [x] Training and inference code on LIBERO (Base model: OpenVLA)
-- [x] Checkpoints on LIBERO (Base model: OpenVLA)
-- [ ] Deployment code in the real world
-- [ ] Code and checkpoints on RoboTwin (Base model: Pi_0)
-
 </div>
 <!-- TODO 替换掉论文的链接 -->
 
@@ -18,6 +12,11 @@
 
 Our model aligns the intermediate visual embeddings of VLAs with geometric representations produced by pretrained 3D foundation models. This alignment demonstrates enhanced performance, training efficiency, and data effificency.
 
+## 🔥 TODO List
+- [x] Training and inference code on LIBERO (Base model: OpenVLA)
+- [x] Checkpoints on LIBERO (Base model: OpenVLA)
+- [ ] Deployment code in the real world
+- [ ] Code and checkpoints on RoboTwin (Base model: Pi_0)
 
 ## 🚀 Get Started
 Please follow our documentation step by step.
