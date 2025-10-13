@@ -8,17 +8,13 @@
 
 ## 🌟 Key Features of **Spatial Forcing (SF)**
 
-### 1. Universality  
-**SF** is a *plug-and-play supervision framework* that can be seamlessly integrated with any **Vision-Language-Action (VLA)** architecture.  
-It substantially enhances spatial reasoning and manipulation capabilities.  
-We provide implementations based on **OpenVLA** and **Pi0**, along with a **quick-start guide** for adapting SF to other VLA models.
+1. **Universality**: **SF** is a *plug-and-play supervision framework* that can be seamlessly integrated with any **Vision-Language-Action (VLA)** architecture.  
+It substantially enhances spatial reasoning and manipulation capabilities. We provide implementations based on **OpenVLA** and **Pi0**, along with a **quick-start guide** for adapting SF to other VLA models.
 
-### 2. Strong Performance  
-**SF** achieves **state-of-the-art (SOTA)** results on both **LIBERO** and **RoboTwin** benchmarks.  
+2. **Strong Performance**: **SF** achieves **state-of-the-art (SOTA)** results on both **LIBERO** and **RoboTwin** benchmarks.  
 In real-world experiments involving complex spatial structures, SF improves task success rates by **up to 50%**.
 
-### 3. Efficient Training  
-**SF** requires only **2% of the training steps** or **5% of the training data** to reach a **66% success rate** on **LIBERO-Long**.  
+3. **Efficient Training**: **SF** requires only **2% of the training steps** or **5% of the training data** to reach a **66% success rate** on **LIBERO-Long**.  
 Moreover, it achieves strong real-world performance with as few as **20 demonstrations**.
 
 
