@@ -6,7 +6,7 @@
 </div>
 <!-- TODO 替换掉论文的链接 -->
 
-## 🌟 Key Features of **Spatial Forcing**
+## 🌟 Key Features of **Spatial Forcing (SF)**
 
 ### 1. Universality  
 **SF** is a *plug-and-play supervision framework* that can be seamlessly integrated with any **Vision-Language-Action (VLA)** architecture.  
