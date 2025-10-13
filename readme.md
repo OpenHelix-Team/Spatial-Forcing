@@ -52,7 +52,7 @@ pip install packaging ninja
 ninja --version; echo $?  # Verify Ninja --> should return exit code "0"
 pip install "flash-attn==2.5.5" --no-build-isolation
 ```
-- If you are uncertain about the version of a dependency, please ref to our [**complete envs list**](envs_list.txt).
+- If you are uncertain about the version of a dependency, please refer to our [**complete envs list**](envs_list.txt).
 
 
 ### Data Preparation
