@@ -31,8 +31,8 @@ Our model aligns the intermediate visual embeddings of VLAs with geometric repre
 
 
 ## 🚀 Get Started
-> To reproduce our results, please follow our documentation step by step.<br/>
-> To integrate Spatial-Forcing into your VLA model, please ref to the [Training Scripts Line373-Line400](./vla-scripts/finetune_align.py#L373-L399).
+> - To reproduce our results, please follow our documentation step by step.<br/>
+> - To integrate Spatial-Forcing into your VLA model, please ref to the [Training Scripts Line373-Line400](./vla-scripts/finetune_align.py#L373-L399).
 
 
 ### Environment Setup
