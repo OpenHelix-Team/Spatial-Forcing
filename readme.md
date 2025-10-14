@@ -8,7 +8,7 @@
 
 ## 🌟 Key Features of Spatial-Forcing (SF)
 
-1. **Universality**: SF is a **plug-and-play** alignment strategy that can be seamlessly integrated with any VLA training process. It substantially enhances spatial reasoning and manipulation capabilities. We provide implementations based on **OpenVLA** and **Pi0**, along with a **quick-start guide** for adapting SF to other VLA models.
+1. **Universality**: SF is a **plug-and-play** alignment strategy that can be seamlessly integrated with any VLA training process, requiring only minimal code modifications with 30 lines. It substantially enhances spatial reasoning and manipulation capabilities. We provide implementations based on **OpenVLA** and **Pi0**, along with a **quick-start guide** for adapting SF to other VLA models.
 
 2. **Strong Performance**: SF achieves **state-of-the-art (SOTA)** results on both **LIBERO** and **RoboTwin** benchmarks.  
 In real-world experiments involving complex spatial structures, SF improves task success rates by **up to 50%**.
@@ -31,8 +31,8 @@ Our model aligns the intermediate visual embeddings of VLAs with geometric repre
 
 
 ## 🚀 Get Started
-- If you want to reproduce our results, please follow our documentation step by step.
-- If you want to integrate Spatial-Forcing into your VLA model, please ref to the [Training Scripts Line373-Line400](./vla-scripts/finetune_align.py#L373-L399).
+- To reproduce our results, please follow our documentation step by step.
+- To integrate Spatial-Forcing into your VLA model, please ref to the [Training Scripts Line373-Line400](./vla-scripts/finetune_align.py#L373-L399).
 
 
 ### Environment Setup
