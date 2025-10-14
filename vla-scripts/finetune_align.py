@@ -382,8 +382,6 @@ def run_forward_pass(
     unnorm_imgs = preprocess_normed_images(
         batch['pixel_values'], processor.image_processor, num_images_in_input
     ).to(device_id)
-    # from torchvision.transforms import ToPILImage
-    # ToPILImage()(unnorm_imgs[0,2].detach().cpu()).save('right.png')
     with torch.autocast("cuda", dtype=torch.bfloat16), torch.no_grad():
         vggt_output = vggt(unnorm_imgs)
     agg_vggt_hidden = vggt_output["features"][layers_align[1]]  # 24 for total layers of VGGT
@@ -391,6 +389,7 @@ def run_forward_pass(
     original_img = vggt_output["images"]
     vggt_hidden = agg_vggt_hidden[:, :, patch_start_idx:, :]
 
+    # Resample VGGT hidden states to match the resolution of VLA hidden states
     H, W = original_img.shape[-2:]
     patch_h, patch_w = H // vggt.patch_size, W // vggt.patch_size
     vggt_hidden = custom_pooling(vggt_hidden, (patch_h, patch_w), (H, W), vision_hidden, pooling_func, use_vggt_pe)
