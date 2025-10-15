@@ -202,6 +202,7 @@ For further discussion and collaboration, please feel free to contact us via Ema
 |:---:|:---:|:---:|
 | Fuhao Li | lfh23@mails.tsinghua.edu.cn | haofuly |
 | Wenxuan Song | songwenxuan0115@gmail.com | swx0757 |
+> WeChat Communication Group is at [here](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/1)
 
 
 ## ❤️ Acknowledgement
