@@ -239,7 +239,7 @@ def preprocess_normed_images(normed_image_feature, image_processor, num_images_i
     Args:
         normed_image_feature (torch.tensor): images preprocessed by OpenVLA with shape (B, N*C*2, H, W)
     Returns:
-        torch.Tensor: Batched tensor of preprocessed images with shape (N, 3, H, W)
+        torch.Tensor: Batched tensor of preprocessed images with shape (B, N, C, H, W)
     """    
     # split images
     img_list = torch.split(normed_image_feature, 2*3, dim=1)  # each img has been normalized twice (dinoV2, SigLIP) 
@@ -304,4 +304,4 @@ def preprocess_normed_images(normed_image_feature, image_processor, num_images_i
         else:
             reshaped_img_list = interpolate_img_list
 
-    return torch.stack(reshaped_img_list, dim=1)  # [bs, 2, C, H, W]
+    return torch.stack(reshaped_img_list, dim=1)  # [bs, N, C, H, W]
