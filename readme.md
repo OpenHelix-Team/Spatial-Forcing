@@ -213,9 +213,9 @@ If you find this work useful, please cite:
 
 ```bibtex
 @article{spatialforcing2025,
-  author    = {Fuhao Li, Wenxuan Song, Han zhao, Jingbo Wang, Pengxiang Ding, Donglin Wang, Long Zeng, Haoang Li},
-  title     = {Spatial Forcing: implicit Spatial Representation Alignment For Vision-Language-Action Model},
-  journal   = {},
+  author    = {Li Fuhao, Song Wenxuan, Zhao Han, Wang Jingbo, Ding Pengxiang, Wang Donglin, Zeng Long, Li Haoang},
+  title     = {Spatial Forcing: Implicit Spatial Representation Alignment For Vision-Language-Action Model},
+  journal   = {arXiv preprint arXiv:2510.12276},
   year      = {2025},
 }
 ```
