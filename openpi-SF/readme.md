@@ -101,7 +101,7 @@ This will spin up a server that listens on port 8000 and waits for observations 
 
 Then, We can then run an client robot script that queries the server.
 
-You need to write your client script according to your robot. A simple client exmaple is as below:
+You need to write your client script according to your robot. A simple [client exmaple](examples/simple_client/main.py) is as below:
 ```bash
 uv run examples/simple_client/main.py --env ALOHA
 ```
