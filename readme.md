@@ -18,7 +18,7 @@ In real-world experiments involving complex spatial structures, SF improves task
 ## 📃 Overview
 ![teaser](./figs/teaser.png)
 
-Our model aligns the intermediate visual embeddings of VLAs with geometric representations produced by pretrained 3D foundation models. This alignment demonstrates enhanced performance, training efficiency, and data effificency.
+Our Spatial-Forcing (SF) model aligns the intermediate visual embeddings of VLAs with geometric representations produced by pretrained 3D foundation models. This alignment demonstrates enhanced performance, training efficiency, and data effificency.
 
 
 <!-- ## Table of Contents
@@ -30,14 +30,17 @@ Our model aligns the intermediate visual embeddings of VLAs with geometric repre
 
 
 ## 🚀 Get Started
-> - To reproduce our results, please follow our documentation step by step.<br/>
-> - To integrate Spatial-Forcing into your VLA model, please ref to the [Training Scripts Line373-Line400](./vla-scripts/finetune_align.py#L373-L399).
+- To reproduce our simulation results, ref to our [openvla-SF folder](openvla-SF).
+
+- To deploy SF policy in real-world robots, ref to our [openpi-SF folder](openpi-SF).
+
+- To integrate SF into your VLA model, ref to the [Simulation Training Scripts Line373-Line400](./openvla-SF/vla-scripts/finetune_align.py#L373-L399).
 
 
 ## 🔥 TODO List
 - [x] Training and inference code on LIBERO (Base model: OpenVLA)
 - [x] Checkpoints on LIBERO (Base model: OpenVLA)
-- [x] Deployment code in the real world (Base model: Pi_0)
+- [x] Deployment code in real world (Base model: Pi_0 torch version)
 
 
 ## 🌏 Contact
