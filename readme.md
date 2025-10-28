@@ -32,9 +32,9 @@ Our Spatial-Forcing (SF) model aligns the intermediate visual embeddings of VLAs
 ## 🚀 Get Started
 - To reproduce our simulation results, ref to our [openvla-SF folder](openvla-SF).
 
-- To deploy SF policy in real-world robots, ref to our [openpi-SF folder](openpi-SF).
+- To deploy policy in real-world robots, ref to our [openpi-SF folder](openpi-SF).
 
-- To integrate SF into your VLA model, ref to the [Simulation Training Scripts Line373-Line400](./openvla-SF/vla-scripts/finetune_align.py#L373-L399).
+- To integrate Spatial-Forcing strategy into your VLA model, ref to [Simulation Training Scripts Line373-Line400](./openvla-SF/vla-scripts/finetune_align.py#L373-L399).
 
 
 ## 🔥 TODO List
