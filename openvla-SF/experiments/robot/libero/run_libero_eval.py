@@ -51,15 +51,6 @@ from experiments.robot.robot_utils import (
 from prismatic.vla.constants import NUM_ACTIONS_CHUNK
 
 
-# import debugpy
-# try:
-#     debugpy.listen(("localhost", 9501))
-#     print("Waiting for debugger attach")
-#     debugpy.wait_for_client()
-# except Exception as e:
-#     pass
-
-
 # Define task suite constants
 class TaskSuite(str, Enum):
     LIBERO_SPATIAL = "libero_spatial"
