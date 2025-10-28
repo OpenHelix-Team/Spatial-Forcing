@@ -38,9 +38,9 @@ Our Spatial-Forcing (SF) model aligns the intermediate visual embeddings of VLAs
 
 
 ## 🔥 TODO List
-- [x] Training and inference code on LIBERO (Base model: OpenVLA)
-- [x] Checkpoints on LIBERO (Base model: OpenVLA)
-- [x] Deployment code in real world (Base model: Pi_0 torch version)
+✅ Training and inference code on LIBERO (Base model: OpenVLA)<br>
+✅ Checkpoints on LIBERO (Base model: OpenVLA)<br>
+✅ Deployment code in real world (Base model: Pi_0 torch version)<br>
 
 
 ## 🌏 Contact
