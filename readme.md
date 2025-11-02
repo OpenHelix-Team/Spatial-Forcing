@@ -1,9 +1,15 @@
 # Spatial Forcing: Implicit Spatial Representation Alignment for Vision-language-action Model
 <div align="center">
 
-[![Paper](https://img.shields.io/badge/Paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](http://arxiv.org/abs/2510.12276) [![Page](https://img.shields.io/badge/Project--Page-blue?style=for-the-badge&logo=homepage&logoColor=white)](https://spatial-forcing.github.io/) [![Hugging Face Collection](https://img.shields.io/badge/Models-fcd022?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/collections/haofuly/spatial-forcing-68ea1bf0f1ac2c60e2ec6caa)
+[![Paper](https://img.shields.io/badge/Paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](http://arxiv.org/abs/2510.12276) [![Page](https://img.shields.io/badge/Project--Page-blue?style=for-the-badge&logo=homepage&logoColor=white)](https://spatial-forcing.github.io/) [![Hugging Face Collection](https://img.shields.io/badge/Models-fcd022?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/collections/haofuly/spatial-forcing-68ea1bf0f1ac2c60e2ec6caa) [![WeChat](https://img.shields.io/badge/WeChat--Group-07C160?style=for-the-badge&logo=wechat&logoColor=white)]([https://github.com/OpenHelix-Team/VLA-Adapter/issues/1](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/1))
 
 </div>
+
+## :loudspeaker: News!
+- **[2025/10/28]** We released our codes based on Pi_0 in real world! Everyone is welcome to use it!🎉
+- **[2025/10/24]** Congradulations to Jialong! He and our SF got the second place in Agibot World Challenge as well as 5000$ prize💰!
+- **[2025/10/18]** Our paper won the 🥇**first place** in the [daily list](https://huggingface.co/papers/2510.12276) and 🥉**third place** in the [weekly list](https://huggingface.co/papers/week/2025-W42) in HF! ⭐
+- **[2025/10/12]** We released our paper on [ArXiv](http://arxiv.org/abs/2510.12276).
 
 ## 🌟 Key Features of Spatial-Forcing (SF)
 
