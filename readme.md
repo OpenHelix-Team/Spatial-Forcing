@@ -1,7 +1,7 @@
 # Spatial Forcing: Implicit Spatial Representation Alignment for Vision-language-action Model
 <div align="center">
 
-[![Paper](https://img.shields.io/badge/Paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](http://arxiv.org/abs/2510.12276) [![Page](https://img.shields.io/badge/Project--Page-blue?style=for-the-badge&logo=homepage&logoColor=white)](https://spatial-forcing.github.io/) [![Hugging Face Collection](https://img.shields.io/badge/Models-fcd022?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/collections/haofuly/spatial-forcing-68ea1bf0f1ac2c60e2ec6caa) [![WeChat](https://img.shields.io/badge/WeChat--Group-07C160?style=for-the-badge&logo=wechat&logoColor=white)]([https://github.com/OpenHelix-Team/VLA-Adapter/issues/1](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/1))
+[![Paper](https://img.shields.io/badge/Paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](http://arxiv.org/abs/2510.12276) [![Page](https://img.shields.io/badge/Project--Page-blue?style=for-the-badge&logo=homepage&logoColor=white)](https://spatial-forcing.github.io/) [![Hugging Face Collection](https://img.shields.io/badge/Models-fcd022?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/collections/haofuly/spatial-forcing-68ea1bf0f1ac2c60e2ec6caa) [![WeChat](https://img.shields.io/badge/WeChat--Group-07C160?style=for-the-badge&logo=wechat&logoColor=white)](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/1)
 
 </div>
 
@@ -56,7 +56,7 @@ For further discussion and collaboration, please feel free to contact us via Ema
 |:---:|:---:|:---:|
 | Fuhao Li | lfh23@mails.tsinghua.edu.cn | haofuly |
 | Wenxuan Song | songwenxuan0115@gmail.com | swx0757 |
-> WeChat Communication Group is at [here](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/1)
+<!-- > WeChat Communication Group is at [here](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/1) -->
 
 
 ## ❤️ Acknowledgement
