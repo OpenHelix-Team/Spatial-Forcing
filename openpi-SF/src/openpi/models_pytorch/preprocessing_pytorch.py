@@ -118,7 +118,7 @@ def preprocess_observation_pytorch(
                         align_corners=False,
                     ).permute(0, 2, 3, 1)  # [b, c, h, w] -> [b, h, w, c]
 
-            # Save original images (with rotation, but without color aug) for VGGT input
+            # Save original images (with color_aug, but without rotation) for VGGT input
             img_inv_padding = torch.where(image == 0, torch.tensor(1, dtype=image.dtype), image)
             img_inv_padding = img_inv_padding.permute(0, 3, 1, 2) if is_channels_first else img_inv_padding
             out_images_wo_aug[key] = img_inv_padding.contiguous()
