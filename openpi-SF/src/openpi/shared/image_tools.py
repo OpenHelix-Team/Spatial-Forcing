@@ -124,3 +124,63 @@ def resize_with_pad_torch(
             padded_images = padded_images.squeeze(0)  # Remove batch dimension if it was added
 
     return padded_images
+
+
+def replace_padding_0to1_torch(image: torch.Tensor,) -> torch.Tensor:
+    """PyTorch version of replace_padding_0to1. 
+    OpenPI requires images with 0 value paddings, while VGGT series requires 1 value paddings.
+    Here it achieves this bounding-box based padding replacement.
+    Args:
+        image: Tensor of shape [*b, h, w, c]
+    Returns:
+        Padding-replaced tensor with same shape as input
+    """
+    single = False
+    if image.dim() == 3:
+        image = image.unsqueeze(0)
+        single = True
+
+    b, h, w, c = image.shape
+    device = image.device
+
+    nonzero_any = (image != 0).any(dim=-1)
+
+    row_any = nonzero_any.any(dim=2)
+    col_any = nonzero_any.any(dim=1)
+
+    top = row_any.to(torch.float32).argmax(dim=1)
+    bottom = h - 1 - row_any.flip(dims=[1]).to(torch.float32).argmax(dim=1)
+    left = col_any.to(torch.float32).argmax(dim=1)
+    right = w - 1 - col_any.flip(dims=[1]).to(torch.float32).argmax(dim=1)
+
+    has_any = row_any.any(dim=1)
+    top = torch.where(has_any, top, torch.zeros_like(top))
+    bottom = torch.where(has_any, bottom, torch.full_like(bottom, h - 1))
+    left = torch.where(has_any, left, torch.zeros_like(left))
+    right = torch.where(has_any, right, torch.full_like(right, w - 1))
+
+    rows = torch.arange(h, device=device).view(1, h, 1)
+    cols = torch.arange(w, device=device).view(1, 1, w)
+    top_v = top.view(b, 1, 1)
+    bottom_v = bottom.view(b, 1, 1)
+    left_v = left.view(b, 1, 1)
+    right_v = right.view(b, 1, 1)
+
+    row_mask = (rows >= top_v) & (rows <= bottom_v)
+    col_mask = (cols >= left_v) & (cols <= right_v)
+    inside_mask = row_mask & col_mask
+
+    padding_mask = ~inside_mask
+
+    pixel_zero = (image == 0).all(dim=-1)
+
+    final_mask = padding_mask & pixel_zero
+
+    if final_mask.any():
+        mask_exp = final_mask.unsqueeze(-1).expand_as(image)
+        one_t = torch.tensor(1, dtype=image.dtype, device=device)
+        image = torch.where(mask_exp, one_t, image)
+
+    if single:
+        image = image.squeeze(0)
+    return image
