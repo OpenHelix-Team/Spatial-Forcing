@@ -415,9 +415,14 @@ class PI0Pytorch(nn.Module):
             vggt_hidden, (patch_h, patch_w), (H, W), vision_hidden, self.pooling_func, self.use_vggt_pe
         )
 
+        # empty image feature masks for alignment loss
+        tokens_per_img = img_len // len(images)
+        img_masks_stack = torch.stack(img_masks, dim=1)
+        align_mask = torch.repeat_interleave(img_masks_stack, repeats=tokens_per_img, dim=1)
+
         # calculate align loss
         with torch.autocast("cuda", dtype=torch.bfloat16):
-            align_loss = align_proj(vision_hidden, vggt_hidden)
+            align_loss = align_proj(vision_hidden, vggt_hidden, align_mask)
 
         return action_loss, align_loss
 

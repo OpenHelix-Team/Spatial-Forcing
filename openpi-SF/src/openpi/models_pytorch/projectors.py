@@ -43,22 +43,22 @@ class AlignProjector(nn.Module):
         projected_features = self.fc2(projected_features)
         return projected_features
     
-    def compute_align_loss_cosine(self, vision_hidden, vggt_hidden):
+    def compute_align_loss_cosine(self, vision_hidden, vggt_hidden, align_mask):
         # vision_hidden has a shape of (bs, N, D)
         def mean_flat(x):
             return torch.mean(x, dim=list(range(1, len(x.size()))))
         align_loss = 0
         bsz = vision_hidden.shape[0]
-        for _vision, _vggt in zip(vision_hidden, vggt_hidden):
+        for _vision, _vggt, _mask in zip(vision_hidden, vggt_hidden, align_mask):
             _vision = torch.nn.functional.normalize(_vision, dim=-1)
             _vggt = torch.nn.functional.normalize(_vggt, dim=-1)
             # align_loss += 1 - torch.mean(vision_hidden * vggt_hidden).sum(dim=-1).mean()
-            align_loss += 1 - mean_flat((_vision * _vggt).sum(dim=-1))  # Cosine similarity loss
+            align_loss += 1 - mean_flat((_vision * _vggt)[_mask].sum(dim=-1))  # Cosine similarity loss
         align_loss /= bsz  # Average over batch size
         return align_loss
     
-    def forward(self, LLM_emb, target_emb):
+    def forward(self, LLM_emb, target_emb, align_mask):
         # project vla dimension and calculate align loss
         LLM_emb = self.align_dimension(LLM_emb)
-        align_loss = self.compute_align_loss_cosine(LLM_emb, target_emb).mean()  # mean for sequence length
+        align_loss = self.compute_align_loss_cosine(LLM_emb, target_emb, align_mask).mean()  # mean for sequence length
         return align_loss
