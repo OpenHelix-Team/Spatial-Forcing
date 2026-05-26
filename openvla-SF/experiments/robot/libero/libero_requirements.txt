@@ -4,3 +4,4 @@ bddl
 easydict
 cloudpickle
 gym
+mujoco==2.3.7
