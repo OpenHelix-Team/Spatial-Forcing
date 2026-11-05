@@ -6,7 +6,7 @@
 
 
 ## :loudspeaker: News!
-- **[2025/11/07]** We released SLA on [ArXiv](http://arxiv.org/abs/2510.12276).
+- **[2026/11/07]** We released SLA on [ArXiv](http://arxiv.org/abs/2510.12276).
 - **[2026/07/07]** We got the first place on the generalization dimension and second place on the average of all 5 dimensions of the comprehensive embodied leaderboard [RoboDojo](https://robodojo-benchmark.com/).
 - **[2026/01/27]** Spatial Forcing is accepted by ICLR 2026!🎉
 - **[2025/10/28]** We released our codes based on Pi_0 in real world! Everyone is welcome to use it!🎉
