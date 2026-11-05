@@ -1,0 +1,3 @@
+[submodule "SLA/third_party/libero_plus"]
+	path = SLA/third_party/libero_plus
+	url = https://github.com/sylvestf/LIBERO-plus.git
