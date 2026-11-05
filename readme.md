@@ -1,12 +1,9 @@
-<div align="left">
+## SLA (Spatial-Language-Action Model): [Paper](http://arxiv.org/abs/2510.12276); [Page](https://embodiedsla.github.io/); [HuggingFace](https://huggingface.co/collections/haofuly/sla-collection)
 
-### SF (Spatial Forcing)： [![Paper](https://img.shields.io/badge/Paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](http://arxiv.org/abs/2510.12276) [![Page](https://img.shields.io/badge/Project--Page-blue?style=for-the-badge&logo=homepage&logoColor=white)](https://spatial-forcing.github.io/) [![Hugging Face Collection](https://img.shields.io/badge/Models-fcd022?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/collections/haofuly/spatial-forcing)
+## SF (Spatial Forcing): [Paper](http://arxiv.org/abs/2510.12276); [Page](https://spatial-forcing.github.io/); [HuggingFace](https://huggingface.co/collections/haofuly/spatial-forcing)
 
-### SLA (Spatial-Language-Action Model）： [![Paper](https://img.shields.io/badge/Paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](http://arxiv.org/abs/2510.12276) [![Page](https://img.shields.io/badge/Project--Page-blue?style=for-the-badge&logo=homepage&logoColor=white)](https://embodiedsla.github.io/) [![Hugging Face Collection](https://img.shields.io/badge/Models-fcd022?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/collections/haofuly/sla-collection)
+>[WeChat Group](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/17) for communication.
 
-[![WeChat](https://img.shields.io/badge/WeChat--Group-07C160?style=for-the-badge&logo=wechat&logoColor=white)](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/17)
-
-</div>
 
 ## :loudspeaker: News!
 - **[2025/11/07]** We released SLA on [ArXiv](http://arxiv.org/abs/2510.12276).
