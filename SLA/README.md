@@ -1,4 +1,4 @@
-# Spatial Forcing++
+# SLA: Scaling Spatial-Language-Action Model via Continual Pre-training
 
 ## 0. TODO List
 ✅ LIBERO-Plus post-training and evaluation<br>
