@@ -18,7 +18,7 @@ href="https://huggingface.co/collections/haofuly/spatial-forcing">Hugging-Face</
 <table align="center">
 <tr><td>
 
-> The core work of these projects is led by [Fuhao Li](https://haofuly.github.io/) and [Wenxuan Song](https://songwxuan.github.io/)  
+> The core work of these projects is led by [Fuhao Li](https://haofuly.github.io/) and [Wenxuan Song](https://songwxuan.github.io/) . 
 > For communication, We provide [WeChat Group](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/17).
 
 </td></tr>
