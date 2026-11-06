@@ -5,16 +5,6 @@
 </p>
 
 
-<table align="center">
-<tr><td>
-
-> **The core work of these projects is led by [Fuhao Li](https://haofuly.github.io/) and [Wenxuan Song](https://songwxuan.github.io/)**  
-> For communication, We provide [WeChat Group](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/17).
-
-</td></tr>
-</table>
-
-
 <p align="center">
 🌟 <b>SLA (Spatial-Language-Action Model) <a href="https://arxiv.org/abs/2611.08373">Paper</a></b> · <b><a href="https://embodiedsla.github.io/">Project-Page</a></b> · <b><a
 href="https://huggingface.co/collections/haofuly/sla-collection">Hugging-Face</a></b>
@@ -24,6 +14,15 @@ href="https://huggingface.co/collections/haofuly/sla-collection">Hugging-Face</a
 🌟 <b>SF (Spatial Forcing) <a href="http://arxiv.org/abs/2510.12276">Paper</a></b> · <b><a href="https://spatial-forcing.github.io/">Project-Page</a></b> · <b><a
 href="https://huggingface.co/collections/haofuly/spatial-forcing">Hugging-Face</a></b>
 </p>
+
+<table align="center">
+<tr><td>
+
+> The core work of these projects is led by [Fuhao Li](https://haofuly.github.io/) and [Wenxuan Song](https://songwxuan.github.io/)  
+> For communication, We provide [WeChat Group](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/17).
+
+</td></tr>
+</table>
 
 
 
