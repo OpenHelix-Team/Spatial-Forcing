@@ -1,4 +1,4 @@
-## SLA (Spatial-Language-Action Model): [Paper](http://arxiv.org/abs/2510.12276); [Page](https://embodiedsla.github.io/); [HuggingFace](https://huggingface.co/collections/haofuly/sla-collection)
+## SLA (Spatial-Language-Action Model): [Paper](https://arxiv.org/abs/2611.08373); [Page](https://embodiedsla.github.io/); [HuggingFace](https://huggingface.co/collections/haofuly/sla-collection)
 
 ## SF (Spatial Forcing): [Paper](http://arxiv.org/abs/2510.12276); [Page](https://spatial-forcing.github.io/); [HuggingFace](https://huggingface.co/collections/haofuly/spatial-forcing)
 
@@ -6,7 +6,7 @@
 
 
 ## :loudspeaker: News!
-- **[2026/11/07]** We released SLA on [ArXiv](http://arxiv.org/abs/2510.12276).
+- **[2026/11/07]** We released SLA on [ArXiv](https://arxiv.org/abs/2611.08373).
 - **[2026/07/07]** We got the first place on the generalization dimension and second place on the average of all 5 dimensions of the comprehensive embodied leaderboard [RoboDojo](https://robodojo-benchmark.com/).
 - **[2026/01/27]** Spatial Forcing is accepted by ICLR 2026!🎉
 - **[2025/10/28]** We released our codes based on Pi_0 in real world! Everyone is welcome to use it!🎉
@@ -55,9 +55,15 @@ We thank these great works and open-source codebases: [OpenVLA-OFT](https://gith
 If you find this work useful, please cite:
 
 ```bibtex
+@article{sla2026,
+  title     = {SLA: Scaling Spatial-Language-Action Model via Continual Pre-training},
+  author    = {Li, Fuhao and Song, Wenxuan and Huang, Qizhou and Zhou, Ziyang and Wang, Jingbo and E, Junwu and Wang, Pengwei and Wang, Yan and Zhou, Shunbo and Li, Haoang},
+  journal   = {arXiv preprint arXiv:2611.08373},
+  year      = {2026}
+}
 @article{spatialforcing2025,
-  author    = {Li Fuhao, Song Wenxuan, Zhao Han, Wang Jingbo, Ding Pengxiang, Wang Donglin, Zeng Long, Li Haoang},
   title     = {Spatial Forcing: Implicit Spatial Representation Alignment For Vision-Language-Action Model},
+  author    = {Li Fuhao, Song Wenxuan, Zhao Han, Wang Jingbo, Ding Pengxiang, Wang Donglin, Zeng Long, Li Haoang},
   journal   = {arXiv preprint arXiv:2510.12276},
   year      = {2025},
 }
