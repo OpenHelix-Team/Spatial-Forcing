@@ -8,8 +8,8 @@
 <table align="center">
 <tr><td>
 
-> [!IMPORTANT]
-> **The core work of these projects is led by [Fuhao Li](https://haofuly.github.io/) and [Wenxuan Song](https://songwxuan.github.io/)**
+> **The core work of these projects is led by [Fuhao Li](https://haofuly.github.io/) and [Wenxuan Song](https://songwxuan.github.io/)**  
+> For communication, We provide [WeChat Group](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/17).
 
 </td></tr>
 </table>
@@ -25,7 +25,7 @@ href="https://huggingface.co/collections/haofuly/sla-collection">Hugging-Face</a
 href="https://huggingface.co/collections/haofuly/spatial-forcing">Hugging-Face</a></b>
 </p>
 
-> [WeChat Group](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/17) for communication.
+
 
 ## :loudspeaker: News!
 - **[2026/11/07]** We released SLA on [ArXiv](https://arxiv.org/abs/2611.08373).
