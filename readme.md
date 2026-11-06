@@ -1,9 +1,31 @@
-## SLA (Spatial-Language-Action Model): [Paper](https://arxiv.org/abs/2611.08373); [Page](https://embodiedsla.github.io/); [HuggingFace](https://huggingface.co/collections/haofuly/sla-collection)
+<p align="center">
+  <picture>
+    <img alt="SLA" src="figs/title.png" style="max-width: 100%;">
+  </picture>
+</p>
 
-## SF (Spatial Forcing): [Paper](http://arxiv.org/abs/2510.12276); [Page](https://spatial-forcing.github.io/); [HuggingFace](https://huggingface.co/collections/haofuly/spatial-forcing)
 
->[WeChat Group](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/17) for communication.
+<table align="center">
+<tr><td>
 
+> [!IMPORTANT]
+> **The core work of these projects is led by [Fuhao Li](https://haofuly.github.io/) and [Wenxuan Song](https://songwxuan.github.io/)**
+
+</td></tr>
+</table>
+
+
+<p align="center">
+🌟 <b>SLA (Spatial-Language-Action Model) <a href="https://arxiv.org/abs/2611.08373">Paper</a></b> · <b><a href="https://embodiedsla.github.io/">Project-Page</a></b> · <b><a
+href="https://huggingface.co/collections/haofuly/sla-collection">Hugging-Face</a></b>
+</p>
+
+<p align="center">
+🌟 <b>SF (Spatial Forcing) <a href="http://arxiv.org/abs/2510.12276">Paper</a></b> · <b><a href="https://spatial-forcing.github.io/">Project-Page</a></b> · <b><a
+href="https://huggingface.co/collections/haofuly/spatial-forcing">Hugging-Face</a></b>
+</p>
+
+> [WeChat Group](https://github.com/OpenHelix-Team/Spatial-Forcing/issues/17) for communication.
 
 ## :loudspeaker: News!
 - **[2026/11/07]** We released SLA on [ArXiv](https://arxiv.org/abs/2611.08373).
