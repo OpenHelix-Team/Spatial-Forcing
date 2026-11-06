@@ -27,6 +27,7 @@ href="https://huggingface.co/collections/haofuly/spatial-forcing">Hugging-Face</
 
 
 ## :loudspeaker: News!
+- **[Soon]** We plan to release SLA v2 arXiv, with formal version instead of SLA-Preview on Robodojo and RoboCasa365 results and checkpoints.
 - **[2026/11/07]** We released SLA on [ArXiv](https://arxiv.org/abs/2611.08373).
 - **[2026/07/07]** We got the first place on the generalization dimension and second place on the average of all 5 dimensions of the comprehensive embodied leaderboard [RoboDojo](https://robodojo-benchmark.com/).
 - **[2026/01/27]** Spatial Forcing is accepted by ICLR 2026!🎉
