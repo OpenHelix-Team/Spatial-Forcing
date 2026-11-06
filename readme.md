@@ -5,15 +5,15 @@
 </p>
 
 
-<p align="center">
+<h3 align="center">
 🌟 <b>SLA (Spatial-Language-Action Model) <a href="https://arxiv.org/abs/2611.08373">Paper</a></b> · <b><a href="https://embodiedsla.github.io/">Project-Page</a></b> · <b><a
 href="https://huggingface.co/collections/haofuly/sla-collection">Hugging-Face</a></b>
-</p>
+</h3>
 
-<p align="center">
+<h3 align="center">
 🌟 <b>SF (Spatial Forcing) <a href="http://arxiv.org/abs/2510.12276">Paper</a></b> · <b><a href="https://spatial-forcing.github.io/">Project-Page</a></b> · <b><a
 href="https://huggingface.co/collections/haofuly/spatial-forcing">Hugging-Face</a></b>
-</p>
+</h3>
 
 <table align="center">
 <tr><td>
