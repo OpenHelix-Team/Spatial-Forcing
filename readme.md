@@ -6,13 +6,13 @@
 
 
 <h3 align="center">
-🌟 <b>SLA (Spatial-Language-Action Model) <a href="https://arxiv.org/abs/2611.08373">Paper</a></b> · <b><a href="https://embodiedsla.github.io/">Project-Page</a></b> · <b><a
-href="https://huggingface.co/collections/haofuly/sla-collection">Hugging-Face</a></b>
+🌟 <b>SLA (Spatial-Language-Action Model) <a href="https://arxiv.org/abs/2611.08373">Paper</a></b> · <b><a href="https://embodiedsla.github.io/">ProjectPage</a></b> · <b><a
+href="https://huggingface.co/collections/haofuly/sla-collection">HuggingFace</a></b>
 </h3>
 
 <h3 align="center">
-🌟 <b>SF (Spatial Forcing) <a href="http://arxiv.org/abs/2510.12276">Paper</a></b> · <b><a href="https://spatial-forcing.github.io/">Project-Page</a></b> · <b><a
-href="https://huggingface.co/collections/haofuly/spatial-forcing">Hugging-Face</a></b>
+🌟 <b>SF (Spatial Forcing) <a href="http://arxiv.org/abs/2510.12276">Paper</a></b> · <b><a href="https://spatial-forcing.github.io/">ProjectPage</a></b> · <b><a
+href="https://huggingface.co/collections/haofuly/spatial-forcing">HuggingFace</a></b>
 </h3>
 
 <table align="center">
