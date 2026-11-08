@@ -82,20 +82,25 @@ rlds = [
 ]
 
 [tool.uv]
-override-dependencies = ["datasets==4.0.0", "ml-dtypes==0.4.1", "tensorstore==0.1.74"]
+# pyarrow>=26 needs NumPy 2, which this project does not use.
+override-dependencies = ["datasets==4.0.0", "ml-dtypes==0.4.1", "tensorstore==0.1.74", "pyarrow==25.0.1"]
 
 [tool.uv.sources]
 openpi-client = { workspace = true }
-lerobot = { git = "https://github.com/huggingface/lerobot", rev = "0cf864870cf29f4738d3ade893e6fd13fbd7cdb5" }
+# Vendored copy of huggingface/lerobot at commit 0cf8648.
+lerobot = { path = "packages/lerobot", editable = true }
 dlimp = { git = "https://github.com/kvablack/dlimp", rev = "ad72ce3a9b414db2185bc0b38461d4101a65477a" }
 
 [tool.uv.workspace]
 members = ["packages/*", "src/vggt", "src/omnivggt"]
+# lerobot stays a path dependency: as a workspace member, uv would also lock all of its optional extras,
+# some of which are git URLs.
+exclude = ["packages/lerobot"]
 
 [tool.ruff]
 line-length = 120
 target-version = "py311"
-extend-exclude = ["docker", "third_party", "src/openpi/models_pytorch/transformers_replace/*"]
+extend-exclude = ["docker", "third_party", "packages/lerobot", "src/openpi/models_pytorch/transformers_replace/*"]
 
 [tool.ruff.lint]
 # https://docs.astral.sh/ruff/rules/
@@ -157,3 +162,4 @@ build-backend = "hatchling.build"
 [tool.pytest.ini_options]
 markers = ["manual: should be run manually."]
 testpaths = ["src", "scripts", "packages"]
+addopts = "--ignore=packages/lerobot"
