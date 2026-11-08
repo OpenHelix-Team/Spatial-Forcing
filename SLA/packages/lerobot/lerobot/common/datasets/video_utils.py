@@ -106,6 +106,12 @@ def decode_video_frames_torchvision(
     # set a video stream reader
     # TODO(rcadene): also load audio stream at the same time
     reader = torchvision.io.VideoReader(video_path, "video")
+    if backend == "pyav":
+        # Local patch, not upstream: torchvision's pyav backend ignores num_threads, so dav1d starts a thread per core
+        # (100+) every time a video is opened and decodes frames ahead that are never used; with several data loader
+        # workers decoding at once, that eats most of the CPU. One decoder thread gives the same frames. It has to be
+        # set before decoding starts.
+        reader.container.streams.video[0].thread_count = 1
 
     # set the first and last requested timestamps
     # Note: previous timestamps are usually loaded, since we need to access the previous key frame

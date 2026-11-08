@@ -76,6 +76,46 @@ from lerobot.common.robot_devices.robots.utils import Robot
 
 CODEBASE_VERSION = "v2.1"
 
+# Local patch, not upstream. `decode_video_frames` decodes every frame from min(query_ts) to max(query_ts) and keeps
+# them all in memory before picking the requested ones, so a query with far-apart timestamps (e.g. the episode's first
+# frame and the current frame) decodes the whole stretch in between. `_decode_video_frames_clustered` groups nearby
+# timestamps and decodes each group separately. With AV1 at 25 fps, a keyframe every 2 frames and a single decoder
+# thread (see video_utils.decode_video_frames_torchvision), decoding one timestamp alone costs at most 2 frames, so
+# timestamps more than MAX_DECODE_GAP_S (5 frames) apart are cheaper to decode separately.
+MAX_DECODE_GAP_S = 0.2
+
+
+def _decode_video_frames_clustered(
+    video_path: Path,
+    query_ts: list[float],
+    tolerance_s: float,
+    backend: str,
+    max_gap_s: float = MAX_DECODE_GAP_S,
+) -> torch.Tensor:
+    """`decode_video_frames`, but timestamps more than `max_gap_s` apart get their own pass.
+
+    Frames come back in `query_ts` order, same as `decode_video_frames`.
+    """
+    order = sorted(range(len(query_ts)), key=query_ts.__getitem__)
+    clusters: list[list[int]] = []
+    for slot in order:
+        if clusters and query_ts[slot] - query_ts[clusters[-1][-1]] <= max_gap_s:
+            clusters[-1].append(slot)
+        else:
+            clusters.append([slot])
+
+    if len(clusters) == 1:
+        return decode_video_frames(video_path, query_ts, tolerance_s, backend)
+
+    frames = [None] * len(query_ts)
+    for cluster in clusters:
+        decoded = decode_video_frames(
+            video_path, [query_ts[slot] for slot in cluster], tolerance_s, backend
+        )
+        for slot, frame in zip(cluster, decoded):
+            frames[slot] = frame
+    return torch.stack(frames)
+
 
 class LeRobotDatasetMetadata:
     def __init__(
@@ -505,8 +545,8 @@ class LeRobotDataset(torch.utils.data.Dataset):
         self.episode_data_index = get_episode_data_index(self.meta.episodes, self.episodes)
 
         # Check timestamps
-        timestamps = torch.stack(self.hf_dataset["timestamp"]).numpy()
-        episode_indices = torch.stack(self.hf_dataset["episode_index"]).numpy()
+        timestamps = torch.stack(list(self.hf_dataset["timestamp"])).numpy()
+        episode_indices = torch.stack(list(self.hf_dataset["episode_index"])).numpy()
         ep_data_index_np = {k: t.numpy() for k, t in self.episode_data_index.items()}
         check_timestamps_sync(timestamps, episode_indices, ep_data_index_np, self.fps, self.tolerance_s)
 
@@ -686,7 +726,8 @@ class LeRobotDataset(torch.utils.data.Dataset):
         for key in self.meta.video_keys:
             if query_indices is not None and key in query_indices:
                 timestamps = self.hf_dataset.select(query_indices[key])["timestamp"]
-                query_timestamps[key] = torch.stack(timestamps).tolist()
+                # datasets>=4 returns a lazy Column here, not a list of tensors.
+                query_timestamps[key] = torch.stack(list(timestamps)).tolist()
             else:
                 query_timestamps[key] = [current_ts]
 
@@ -694,7 +735,7 @@ class LeRobotDataset(torch.utils.data.Dataset):
 
     def _query_hf_dataset(self, query_indices: dict[str, list[int]]) -> dict:
         return {
-            key: torch.stack(self.hf_dataset.select(q_idx)[key])
+            key: torch.stack(list(self.hf_dataset.select(q_idx)[key]))
             for key, q_idx in query_indices.items()
             if key not in self.meta.video_keys
         }
@@ -708,7 +749,9 @@ class LeRobotDataset(torch.utils.data.Dataset):
         item = {}
         for vid_key, query_ts in query_timestamps.items():
             video_path = self.root / self.meta.get_video_file_path(ep_idx, vid_key)
-            frames = decode_video_frames(video_path, query_ts, self.tolerance_s, self.video_backend)
+            frames = _decode_video_frames_clustered(
+                video_path, query_ts, self.tolerance_s, self.video_backend
+            )
             item[vid_key] = frames.squeeze(0)
 
         return item
