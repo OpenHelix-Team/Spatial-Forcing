@@ -84,7 +84,7 @@ class RobodojoSimInputs(_RobodojoInputs):
         position = np.einsum("ij,...j->...i", _SOURCE_TO_TARGET, pose[..., :3] - _ROBOT_BASE_MIDPOINT)
         xyzw = np.concatenate([pose[..., 4:7], pose[..., 3:4]], axis=-1)
         source_rotation = Rotation.from_quat(xyzw.reshape(-1, 4)).as_matrix().reshape(*pose.shape[:-1], 3, 3)
-        target_rotation = np.einsum("ij,...jk,kl->...il", _SOURCE_TO_TARGET, source_rotation, _TARGET_TO_SOURCE)
+        target_rotation = np.einsum("ij,...jk->...ik", _SOURCE_TO_TARGET, source_rotation)
         rpy = Rotation.from_matrix(target_rotation.reshape(-1, 3, 3)).as_euler("xyz").reshape(*pose.shape[:-1], 3)
         return np.concatenate([position, rpy, pose[..., 7:8]], axis=-1)
 
@@ -130,7 +130,7 @@ class RobodojoSimOutputs(_RobodojoOutputs):
         target_rotation = Rotation.from_euler("xyz", pose[..., 3:6].reshape(-1, 3)).as_matrix().reshape(
             *pose.shape[:-1], 3, 3
         )
-        source_rotation = np.einsum("ij,...jk,kl->...il", _TARGET_TO_SOURCE, target_rotation, _SOURCE_TO_TARGET)
+        source_rotation = np.einsum("ij,...jk->...ik", _TARGET_TO_SOURCE, target_rotation)
         xyzw = Rotation.from_matrix(source_rotation.reshape(-1, 3, 3)).as_quat().reshape(*pose.shape[:-1], 4)
         quaternion = np.concatenate([xyzw[..., 3:4], xyzw[..., :3]], axis=-1)
         return np.concatenate([position, quaternion, pose[..., 6:7]], axis=-1)
