@@ -13,6 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Modified from huggingface/lerobot at commit 0cf8648:
+# - support for datasets 4, whose lazy columns are turned into lists before torch.stack;
+# - query timestamps that are far apart are decoded in separate passes (_decode_video_frames_clustered).
 import contextlib
 import logging
 import shutil
