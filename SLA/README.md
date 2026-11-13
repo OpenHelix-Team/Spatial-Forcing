@@ -4,7 +4,7 @@
 ✅ LIBERO-Plus post-training and evaluation<br>
 ✅ RoboTwin post-training and evaluation<br>
 ✅ Continual pre-training corpus<br>
-❌ RoboDojo-Real post-training and evaluation (before 20261109)<br>
+✅ RoboDojo-Real post-training and evaluation (before 20261109)<br>
 ❌ Training efficiency optimization<br>
 ❌ Continual pre-training data<br>
 
@@ -66,6 +66,8 @@ uv run --no-sync scripts/train_align.py <CONFIG_NAME> --exp-name=<EXP_NAME>
 # example for LIBERO-Plus
 uv run --no-sync scripts/train_align.py train_libero_plus --exp-name=experiments
 ```
+
+> As for RoboDojo-Real training, we incorporate a memory machanism into SLA policy, please ref to [SLA_Memory repo](https://github.com/XPolicyLab/XPolicyLab/pull/237).
 
 ## 4. Inference
 > We have provided the already post-trained checkpoints for this inference.  
@@ -130,4 +132,13 @@ uv run scripts/serve_policy.py policy:checkpoint --policy.config=train_libero_pl
 
 <details>
 <summary><strong>RoboTwin</strong></summary>
+
+As for RoboTwin evaluation, we integrate our SLA policy into the XPolicyLab, please ref to [XPolicyLab SLA](https://github.com/XPolicyLab/XPolicyLab/pull/235) for evaluation.
 </details>
+
+<details>
+<summary><strong>RojoDojo-Real</strong></summary>
+
+As for RoboDojo-Real evaluation, we incorporate a memory machanism into SLA policy, please ref to [XPolicyLab SLA_Memory](https://github.com/XPolicyLab/XPolicyLab/pull/237) for evaluation.
+</details>
+
