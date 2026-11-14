@@ -363,11 +363,10 @@ def main(config: _config.TrainConfig):
     for step in pbar:
         if dist_info.is_primary and step == start_step:
             logging.info("Starting first train step; JAX compilation may take several minutes.")
-        train_step_s = 0.0
-        data_wait_s = 0.0
+        step_start = time.perf_counter()
+        data_fetch_s = 0.0
         micro_infos = []
         for micro_step in range(accumulation_steps):
-            train_start = time.perf_counter()
             with sharding.set_mesh(mesh):
                 if accumulation_steps == 1:
                     train_state, info = ptrain_step(train_rng, train_state, batch)
@@ -379,35 +378,36 @@ def main(config: _config.TrainConfig):
                         batch,
                         jnp.array(micro_step, dtype=jnp.int32),
                     )
-                    jax.block_until_ready(micro_info)
                     micro_infos.append(micro_info)
-            if accumulation_steps == 1:
-                jax.block_until_ready(info)
-            train_step_s += time.perf_counter() - train_start
 
+            # JAX dispatches the step asynchronously and returns right away: fetch the next batch while the GPUs
+            # compute, then wait for the step to finish. Waiting first would leave the GPUs idle during the fetch.
             has_next_batch = step + 1 < config.num_train_steps or micro_step + 1 < accumulation_steps
             if has_next_batch:
-                data_wait_start = time.perf_counter()
+                fetch_start = time.perf_counter()
                 batch = next(data_iter)
-                data_wait_s += time.perf_counter() - data_wait_start
+                data_fetch_s += time.perf_counter() - fetch_start
+            jax.block_until_ready(info if accumulation_steps == 1 else micro_info)
 
         if accumulation_steps > 1:
-            apply_start = time.perf_counter()
             with sharding.set_mesh(mesh):
                 train_state, gradient_accumulator, update_info = papply_accumulated_gradients(
                     train_state, gradient_accumulator
                 )
                 jax.block_until_ready(update_info)
-            train_step_s += time.perf_counter() - apply_start
             info = jax.tree.map(jnp.mean, common_utils.stack_forest(micro_infos))
             info.update(update_info)
 
+        # step_s is the whole step from dispatch to completion; data_fetch_s is the time spent fetching the next
+        # batch, overlapped with compute. They mean something different from the old train_step_s (compute only)
+        # and data_wait_s (GPU idle time), hence the new names.
+        step_s = time.perf_counter() - step_start
         infos.append(info)
         timing_info = {
-            "train_step_s": train_step_s,
-            "data_wait_s": data_wait_s,
-            "samples_per_s": config.effective_batch_size / train_step_s,
-            "steps_per_h": 3600.0 / train_step_s,
+            "step_s": step_s,
+            "data_fetch_s": data_fetch_s,
+            "samples_per_s": config.effective_batch_size / step_s,
+            "steps_per_h": 3600.0 / step_s,
         }
         timing_infos.append(timing_info)
         if step % config.log_interval == 0:
