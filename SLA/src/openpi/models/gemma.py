@@ -60,6 +60,7 @@ class HiddenCaptureSpec:
 
 
 Variant = Literal["dummy", "gemma_300m", "gemma_300m_lora", "gemma_2b", "gemma_2b_lora"]
+AttentionImpl = Literal["xla", "cudnn", "xla_cudnn"]
 
 
 def get_config(variant: Variant) -> Config:
@@ -168,6 +169,7 @@ class Attention(nn.Module):
     """Attention module."""
 
     configs: Sequence[Config]
+    attention_impl: AttentionImpl = "xla"
 
     @nn.compact
     def __call__(self, xs, positions, attn_mask, kv_cache):
@@ -222,22 +224,61 @@ class Attention(nn.Module):
             k = jnp.concatenate([cache_k, k], axis=1)
             v = jnp.concatenate([cache_v, v], axis=1)
 
-        q = einops.rearrange(q, "B T (K G) H -> B T K G H", K=self.configs[0].num_kv_heads)
-        logits = jnp.einsum("BTKGH,BSKH->BKGTS", q, k, preferred_element_type=jnp.float32)
-
         if attn_mask.shape != (q.shape[0], 1, q.shape[1], k.shape[1]):
             raise ValueError(
                 f"Attention mask with shape {attn_mask.shape} but shapes for q and k are: {q.shape} and {k.shape}"
             )
 
-        # big_neg = jnp.finfo(logits.dtype).min
-        big_neg = -2.3819763e38  # See gemma/modules.py
-        masked_logits = jnp.where(attn_mask[:, :, None, :, :], logits, big_neg)
+        if self.attention_impl == "cudnn":
+            # cuDNN returns NaN in the backward pass for fully masked rows when the sequence length
+            # is not a multiple of 64, so make fully masked rows fully visible instead.
+            attn_mask = attn_mask | ~attn_mask.any(axis=-1, keepdims=True)
+            encoded = jax.nn.dot_product_attention(q, k, v, mask=attn_mask, scale=1.0, implementation="cudnn")
+        elif self.attention_impl == "xla_cudnn":
+            # cuDNN for the prefix rows, XLA for the action-token rows. The split is exact because prefix rows never
+            # attend to action tokens. cuDNN's backward pass is much less accurate on the action rows, and the time
+            # conditioning amplifies that error. Inference runs the prefix alone first (all cuDNN), then the
+            # KV-cached denoising steps with action tokens only (all XLA).
+            assert kv_cache is None or xs[0] is None, "With a KV cache, the prefix columns are not at the start of k"
+            num_prefix = 0 if xs[0] is None else xs[0].shape[1]
+            parts = []
+            if num_prefix:
+                # Prefix rows see only prefix columns; fully masked rows become visible, as in the cudnn branch.
+                prefix_mask = attn_mask[:, :, :num_prefix, :num_prefix]
+                prefix_mask = prefix_mask | ~prefix_mask.any(axis=-1, keepdims=True)
+                parts.append(
+                    jax.nn.dot_product_attention(
+                        q[:, :num_prefix],
+                        k[:, :num_prefix],
+                        v[:, :num_prefix],
+                        mask=prefix_mask,
+                        scale=1.0,
+                        implementation="cudnn",
+                    )
+                )
+            if num_prefix < q.shape[1]:
+                # Action rows see every column; same math as the xla branch below.
+                q_action = einops.rearrange(
+                    q[:, num_prefix:], "B T (K G) H -> B T K G H", K=self.configs[0].num_kv_heads
+                )
+                logits = jnp.einsum("BTKGH,BSKH->BKGTS", q_action, k, preferred_element_type=jnp.float32)
+                masked_logits = jnp.where(attn_mask[:, :, None, num_prefix:, :], logits, -2.3819763e38)
+                probs = jax.nn.softmax(masked_logits, axis=-1).astype(dtype)
+                encoded_action = jnp.einsum("BKGTS,BSKH->BTKGH", probs, v)
+                parts.append(einops.rearrange(encoded_action, "B T K G H -> B T (K G) H"))
+            encoded = jnp.concatenate(parts, axis=1)
+        else:
+            q = einops.rearrange(q, "B T (K G) H -> B T K G H", K=self.configs[0].num_kv_heads)
+            logits = jnp.einsum("BTKGH,BSKH->BKGTS", q, k, preferred_element_type=jnp.float32)
 
-        probs = jax.nn.softmax(masked_logits, axis=-1).astype(dtype)
+            # big_neg = jnp.finfo(logits.dtype).min
+            big_neg = -2.3819763e38  # See gemma/modules.py
+            masked_logits = jnp.where(attn_mask[:, :, None, :, :], logits, big_neg)
 
-        encoded = jnp.einsum("BKGTS,BSKH->BTKGH", probs, v)
-        encoded = einops.rearrange(encoded, "B T K G H -> B T (K G) H")
+            probs = jax.nn.softmax(masked_logits, axis=-1).astype(dtype)
+
+            encoded = jnp.einsum("BKGTS,BSKH->BTKGH", probs, v)
+            encoded = einops.rearrange(encoded, "B T K G H -> B T (K G) H")
 
         out = []
         start = 0
@@ -297,6 +338,7 @@ class Block(nn.Module):
 
     dropout: float = 0.0
     dropout_bdims: tuple[int, ...] = ()
+    attention_impl: AttentionImpl = "xla"
 
     @nn.compact
     def __call__(
@@ -314,7 +356,7 @@ class Block(nn.Module):
         xs = sharding.activation_sharding_constraint(xs)
         drop = nn.Dropout(self.dropout, self.dropout_bdims) if self.dropout else lambda x, _: x
 
-        attn = Attention(configs=self.configs, name="attn")
+        attn = Attention(configs=self.configs, attention_impl=self.attention_impl, name="attn")
 
         pre_attn = []
         gates = []
@@ -379,6 +421,7 @@ class Module(nn.Module):
     dropout: float = 0.0
     dropout_bdims: tuple[int, ...] = ()  # Every float is dropped independently.
     adarms: bool = False
+    attention_impl: AttentionImpl = "xla"
 
     def setup(self):
         # all experts must have the same depth
@@ -413,6 +456,7 @@ class Module(nn.Module):
             configs=self.configs,
             dropout=self.dropout,
             dropout_bdims=self.dropout_bdims,
+            attention_impl=self.attention_impl,
         )
         self.final_norms = [RMSNorm(name=_name("final_norm", i)) for i in range(len(self.configs))]
 
