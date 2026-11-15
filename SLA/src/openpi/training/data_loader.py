@@ -6,8 +6,10 @@ import multiprocessing
 import os
 import pathlib
 import queue
+import sys
 import threading
 import time
+import types
 import typing
 from typing import Literal, Protocol, SupportsIndex, TypeVar
 
@@ -827,7 +829,11 @@ class TorchDataLoader:
 
         mp_context = None
         if num_workers > 0:
-            mp_context = multiprocessing.get_context("spawn")
+            mp_context = multiprocessing.get_context("forkserver")
+            main_modules = [
+                m.__name__ for m in vars(sys.modules["__main__"]).values() if isinstance(m, types.ModuleType)
+            ]
+            mp_context.set_forkserver_preload([__name__, *main_modules])
 
         generator = torch.Generator()
         generator.manual_seed(seed)
