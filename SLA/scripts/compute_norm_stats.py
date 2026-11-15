@@ -489,7 +489,7 @@ def allocate_component_sampling_plans(
     """Allocate mixed-dataset sampling plans.
 
     For mixed norm stats, ``max_frames`` is a per-component cap rather than a
-    global frame budget. Component weighting matches ``WeightedMixedDataset``:
+    global frame budget. Component weighting matches the mixed training dataset:
     each component contributes in proportion to ``len(component) * weight``.
     """
     dataset_lengths = np.asarray(dataset_lengths, dtype=int)

@@ -1,5 +1,4 @@
 from collections.abc import Iterator, Sequence
-from concurrent.futures import ThreadPoolExecutor
 import dataclasses
 import functools
 import logging
@@ -261,86 +260,6 @@ class _FastLocalLeRobotDataset(lerobot_dataset.LeRobotDataset):
         return items
 
 
-class WeightedMixedDataset(Dataset):
-    """
-    Mixes multiple datasets with configurable source weights.
-    Each dataset is sampled with probability proportional to ``len(dataset) * weight``.
-    """
-    def __init__(self, datasets: Sequence[Dataset], weights: Sequence[float], *, seed: int = 0):
-        weight_array = np.asarray(weights)
-        dataset_lengths = np.asarray([len(dataset) for dataset in datasets])
-        effective_weights = dataset_lengths * weight_array
-        total_weight = effective_weights.sum()
-
-        self._datasets = datasets
-        self._weights = effective_weights / total_weight
-        self._length = int(dataset_lengths.sum())
-        self._seed = seed
-        self._epoch = 0
-        self._read_chunk_size = int(os.environ.get("OPENPI_MIXED_READ_CHUNK_SIZE", "1"))
-        if self._read_chunk_size < 1:
-            raise ValueError("OPENPI_MIXED_READ_CHUNK_SIZE must be positive.")
-        self._read_threads = 0
-        self._executor: ThreadPoolExecutor | None = None
-
-    def set_epoch(self, epoch: int) -> None:
-        self._epoch = epoch
-
-    def __getitem__(self, index: SupportsIndex) -> dict:
-        index_value = index.__index__()
-        if index_value < 0:
-            index_value %= self._length
-
-        dataset_index, sample_index = self._sample_location(index_value)
-        return self._datasets[dataset_index][sample_index]
-
-    def _sample_location(self, index: int) -> tuple[int, int]:
-        rng = np.random.default_rng(np.random.SeedSequence([self._seed, self._epoch, index]))
-        dataset_index = int(rng.choice(len(self._datasets), p=self._weights))
-        return dataset_index, int(rng.integers(len(self._datasets[dataset_index])))
-
-    def __getitems__(self, indices: Sequence[SupportsIndex]) -> list[dict]:
-        if not indices:
-            return []
-
-        chunks: list[tuple[int, tuple[int, ...]]] = []
-        for chunk_start in range(0, len(indices), self._read_chunk_size):
-            chunk = indices[chunk_start : chunk_start + self._read_chunk_size]
-            component_index, start = self._sample_location(chunk[0].__index__())
-            dataset = self._datasets[component_index]
-            sample_indices = tuple((start + offset) % len(dataset) for offset in range(len(chunk)))
-            chunks.append((component_index, sample_indices))
-
-        def load_chunk(chunk: tuple[int, tuple[int, ...]]) -> list[dict]:
-            component_index, sample_indices = chunk
-            dataset = self._datasets[component_index]
-            getitems = getattr(dataset, "__getitems__", None)
-            return getitems(sample_indices) if getitems is not None else [dataset[index] for index in sample_indices]
-
-        if self._read_threads <= 1 or len(chunks) == 1:
-            results = [load_chunk(chunk) for chunk in chunks]
-        else:
-            if self._executor is None:
-                self._executor = ThreadPoolExecutor(max_workers=self._read_threads, thread_name_prefix="mixed-data")
-            results = list(self._executor.map(load_chunk, chunks))
-        return [item for chunk_items in results for item in chunk_items]
-
-    def set_read_threads(self, count: int) -> None:
-        if count < 0:
-            raise ValueError(f"Read thread count must be non-negative, got {count}.")
-        if count != self._read_threads:
-            self.close()
-            self._read_threads = count
-
-    def close(self) -> None:
-        if self._executor is not None:
-            self._executor.shutdown()
-            self._executor = None
-
-    def __len__(self) -> int:
-        return self._length
-
-
 class _PrefetchIterator:
     """Background-prefetch an iterator into a bounded queue."""
 
@@ -535,7 +454,6 @@ def create_transformed_mixed_torch_dataset(
     action_horizon: int,
     model_config: _model.BaseModelConfig,
     *,
-    seed: int = 0,
     skip_norm_stats: bool = False,
     tail_transforms: Sequence[_transforms.DataTransformFn] = (),
 ) -> Dataset:
@@ -590,7 +508,11 @@ def create_transformed_mixed_torch_dataset(
         data_config.fast_local_loading,
         time.perf_counter() - materialize_start,
     )
-    return WeightedMixedDataset(aligned_datasets, data_config.weights, seed=seed)
+    if len(set(data_config.weights)) > 1:
+        raise NotImplementedError(f"Unequal mixed source weights are not supported: {data_config.weights}")
+    # Every frame exactly once per epoch: the sampler shuffles the concatenated indices in the main process, so
+    # persistent workers do not need to know the epoch.
+    return torch.utils.data.ConcatDataset(aligned_datasets)
 
 
 def transform_iterable_dataset(
@@ -747,7 +669,6 @@ def create_torch_data_loader(
             data_config,
             action_horizon,
             model_config,
-            seed=seed,
             skip_norm_stats=skip_norm_stats,
         )
     else:
@@ -798,6 +719,7 @@ def create_torch_data_loader(
         seed=seed,
         framework=framework,
         return_host_batch=return_host_batch,
+        drop_index=isinstance(data_config, _config.MixedDataConfig),
     )
 
     return DataLoaderImpl(data_config, data_loader)
@@ -863,6 +785,7 @@ class TorchDataLoader:
         framework: str = "jax",
         prefetch_depth: int = 4,
         return_host_batch: bool = False,
+        drop_index: bool = False,
     ):
         """Create a PyTorch data loader.
 
@@ -878,6 +801,7 @@ class TorchDataLoader:
             num_workers: The number of worker processes to use. If zero, the data loader will
                 execute in the main process.
             seed: The seed to use for shuffling the data.
+            drop_index: Drop each sample's "index", which only some sources of a mixed dataset provide.
         """
         if jax.process_count() > 1 and sampler is None:
             raise NotImplementedError("Data loading with multiple processes is not supported.")
@@ -901,18 +825,8 @@ class TorchDataLoader:
         self._prefetch_depth = prefetch_depth
         self._return_host_batch = return_host_batch
 
-        process_workers = num_workers
-        if isinstance(dataset, WeightedMixedDataset):
-            dataset.set_read_threads(num_workers)
-            process_workers = 0
-            logging.info(
-                "Mixed batch loading: read_threads=%s, read_chunk_size=%s, batched_video_decode=True",
-                num_workers,
-                dataset._read_chunk_size,  # noqa: SLF001
-            )
-
         mp_context = None
-        if process_workers > 0:
+        if num_workers > 0:
             mp_context = multiprocessing.get_context("spawn")
 
         generator = torch.Generator()
@@ -922,10 +836,10 @@ class TorchDataLoader:
             batch_size=local_batch_size,
             shuffle=(sampler is None and shuffle),  # Don't shuffle if using sampler
             sampler=sampler,
-            num_workers=process_workers,
+            num_workers=num_workers,
             multiprocessing_context=mp_context,
-            persistent_workers=process_workers > 0,
-            collate_fn=functools.partial(_collate_fn, drop_index=isinstance(dataset, WeightedMixedDataset)),
+            persistent_workers=num_workers > 0,
+            collate_fn=functools.partial(_collate_fn, drop_index=drop_index),
             worker_init_fn=_worker_init_fn,
             drop_last=True,
             generator=generator,
@@ -937,34 +851,30 @@ class TorchDataLoader:
 
     def _yield_batches(self):
         num_items = 0
-        try:
+        while True:
+            if self._sampler is not None and hasattr(self._sampler, "set_epoch"):
+                self._sampler.set_epoch(self._epoch)
+            if hasattr(self._dataset, "set_epoch"):
+                self._dataset.set_epoch(self._epoch)
+            self._epoch += 1
+            data_iter = iter(self._data_loader)
             while True:
-                if self._sampler is not None and hasattr(self._sampler, "set_epoch"):
-                    self._sampler.set_epoch(self._epoch)
-                if hasattr(self._dataset, "set_epoch"):
-                    self._dataset.set_epoch(self._epoch)
-                self._epoch += 1
-                data_iter = iter(self._data_loader)
-                while True:
-                    if self._num_batches is not None and num_items >= self._num_batches:
-                        return
-                    try:
-                        batch = next(data_iter)
-                    except StopIteration:
-                        break  # We've exhausted the dataset. Create a new iterator and start over.
-                    num_items += 1
-                    # For JAX, convert to sharded arrays; for PyTorch, return torch tensors
-                    if self._sharding is not None:
-                        sharded_batch = jax.tree.map(
-                            lambda x: jax.make_array_from_process_local_data(self._sharding, x), batch
-                        )
-                        yield (sharded_batch, batch) if self._return_host_batch else sharded_batch
-                    else:
-                        torch_batch = jax.tree.map(torch.as_tensor, batch)
-                        yield (torch_batch, batch) if self._return_host_batch else torch_batch
-        finally:
-            if isinstance(self._dataset, WeightedMixedDataset):
-                self._dataset.close()
+                if self._num_batches is not None and num_items >= self._num_batches:
+                    return
+                try:
+                    batch = next(data_iter)
+                except StopIteration:
+                    break  # We've exhausted the dataset. Create a new iterator and start over.
+                num_items += 1
+                # For JAX, convert to sharded arrays; for PyTorch, return torch tensors
+                if self._sharding is not None:
+                    sharded_batch = jax.tree.map(
+                        lambda x: jax.make_array_from_process_local_data(self._sharding, x), batch
+                    )
+                    yield (sharded_batch, batch) if self._return_host_batch else sharded_batch
+                else:
+                    torch_batch = jax.tree.map(torch.as_tensor, batch)
+                    yield (torch_batch, batch) if self._return_host_batch else torch_batch
 
     def __iter__(self):
         iterator = self._yield_batches()
