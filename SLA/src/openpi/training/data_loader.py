@@ -262,6 +262,45 @@ class _FastLocalLeRobotDataset(lerobot_dataset.LeRobotDataset):
         return items
 
 
+class WeightedMixedSampler(torch.utils.data.Sampler[int]):
+    """Samples a ConcatDataset of mixed sources with configurable source weights.
+
+    Each draw picks a source with probability proportional to ``len(source) * weight``, then a random frame in it.
+    The draws run in the main process, so they follow ``set_epoch`` even with persistent workers.
+    """
+
+    def __init__(
+        self,
+        dataset: torch.utils.data.ConcatDataset,
+        weights: Sequence[float],
+        *,
+        seed: int,
+        rank: int = 0,
+        num_replicas: int = 1,
+    ):
+        ends = np.asarray(dataset.cumulative_sizes)
+        self._lengths = np.diff(ends, prepend=0)
+        self._starts = ends - self._lengths
+        effective_weights = self._lengths * np.asarray(weights)
+        self._probabilities = effective_weights / effective_weights.sum()
+        self._num_samples = len(dataset) // num_replicas
+        self._seed = seed
+        self._rank = rank
+        self._epoch = 0
+
+    def set_epoch(self, epoch: int) -> None:
+        self._epoch = epoch
+
+    def __iter__(self) -> Iterator[int]:
+        # Draws are independent, so each rank draws its own share instead of slicing one global draw.
+        rng = np.random.default_rng([self._seed, self._epoch, self._rank])
+        sources = rng.choice(len(self._probabilities), size=self._num_samples, p=self._probabilities)
+        return iter((self._starts[sources] + rng.integers(self._lengths[sources])).tolist())
+
+    def __len__(self) -> int:
+        return self._num_samples
+
+
 class _PrefetchIterator:
     """Background-prefetch an iterator into a bounded queue."""
 
@@ -510,10 +549,7 @@ def create_transformed_mixed_torch_dataset(
         data_config.fast_local_loading,
         time.perf_counter() - materialize_start,
     )
-    if len(set(data_config.weights)) > 1:
-        raise NotImplementedError(f"Unequal mixed source weights are not supported: {data_config.weights}")
-    # Every frame exactly once per epoch: the sampler shuffles the concatenated indices in the main process, so
-    # persistent workers do not need to know the epoch.
+    # Sampling runs in the main process (the DataLoader sampler), so persistent workers do not need to know the epoch.
     return torch.utils.data.ConcatDataset(aligned_datasets)
 
 
@@ -708,6 +744,11 @@ def create_torch_data_loader(
                 seed=seed,
             )
         local_batch_size = batch_size // process_count
+
+    if isinstance(data_config, _config.MixedDataConfig) and len(set(data_config.weights)) > 1:
+        # Equal weights keep the plain shuffle (every frame once per epoch); unequal weights draw with replacement.
+        rank, num_replicas = (sampler.rank, sampler.num_replicas) if sampler is not None else (0, 1)
+        sampler = WeightedMixedSampler(dataset, data_config.weights, seed=seed, rank=rank, num_replicas=num_replicas)
 
     logging.info(f"local_batch_size: {local_batch_size}")
     data_loader = TorchDataLoader(
