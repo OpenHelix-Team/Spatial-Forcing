@@ -6,7 +6,6 @@
 ✅ Continual pre-training corpus<br>
 ✅ RoboDojo-Real post-training and evaluation (before 20261109)<br>
 ❌ Training efficiency optimization<br>
-❌ Continual pre-training data<br>
 
 ## 1. Environment Setup
 We use [uv](https://docs.astral.sh/uv/) to manage Python dependencies:
