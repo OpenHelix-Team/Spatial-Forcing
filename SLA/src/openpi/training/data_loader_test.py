@@ -1,6 +1,8 @@
 import dataclasses
 
 import jax
+import numpy as np
+import torch
 
 from openpi.models import pi0_config
 from openpi.training import config as _config
@@ -45,6 +47,24 @@ def test_torch_data_loader_parallel():
 
     for batch in batches:
         assert all(x.shape[0] == 4 for x in jax.tree.leaves(batch))
+
+
+def test_weighted_mixed_sampler():
+    dataset = torch.utils.data.ConcatDataset([range(1000), range(3000)])
+    sampler = _data_loader.WeightedMixedSampler(dataset, [3.0, 1.0], seed=0)
+    draws = list(sampler)
+
+    assert len(draws) == len(dataset)
+    # len * weight is 3000 for both sources, so each gets about half of the draws.
+    assert abs(np.mean(np.asarray(draws) < 1000) - 0.5) < 0.05
+    sampler.set_epoch(1)
+    assert list(sampler) != draws
+
+    rank0, rank1 = (
+        _data_loader.WeightedMixedSampler(dataset, [3.0, 1.0], seed=0, rank=rank, num_replicas=2) for rank in (0, 1)
+    )
+    assert len(rank0) == len(dataset) // 2
+    assert list(rank0) != list(rank1)
 
 
 def test_with_fake_dataset():

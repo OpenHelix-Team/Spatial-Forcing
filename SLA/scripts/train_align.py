@@ -396,13 +396,6 @@ def main(config: _config.TrainConfig):
     align_worker = align_utils.AsyncAlignFeatureWorker(extractor)
     start_step = int(train_state.step)
 
-    def load_and_submit_next_batch():
-        load_start = time.perf_counter()
-        next_jax_batch, next_host_batch = next(data_iter)
-        next_data_load_s = time.perf_counter() - load_start
-        align_worker.submit(next_host_batch[0], reference_tokens=reference_tokens)
-        return next_jax_batch, next_data_load_s
-
     if start_step < config.num_train_steps:
         align_worker.submit(host_batch[0], reference_tokens=reference_tokens)
 
@@ -429,16 +422,12 @@ def main(config: _config.TrainConfig):
             data_load_s = 0.0
             train_step_s = 0.0
             micro_infos = []
-            submit_after_update = False
+            # With shared GPUs, the batch fetched in the last accumulation micro step goes to VGGT after the update.
+            host_batch_after_update = None
 
             for micro_step in range(accumulation_steps):
                 has_next_batch = step + 1 < config.num_train_steps or micro_step + 1 < accumulation_steps
                 align_features = align_worker.result(release_cache=shared_align_devices)
-                next_batch = None
-                if not shared_align_devices and has_next_batch:
-                    next_batch, next_data_load_s = load_and_submit_next_batch()
-                    data_load_s += next_data_load_s
-
                 align_targets, align_mask, micro_transport_s = align_utils.shard_align_features(
                     align_features,
                     sharding=data_sharding,
@@ -450,7 +439,6 @@ def main(config: _config.TrainConfig):
                 with sharding.set_mesh(mesh):
                     if accumulation_steps == 1:
                         train_state, info = ptrain_step(train_rng, train_state, batch, align_targets, align_mask)
-                        jax.block_until_ready(info)
                     else:
                         gradient_accumulator, micro_info = paccumulate_train_step(
                             train_rng,
@@ -461,20 +449,28 @@ def main(config: _config.TrainConfig):
                             align_mask,
                             jnp.array(micro_step, dtype=jnp.int32),
                         )
-                        jax.block_until_ready(micro_info)
                         micro_infos.append(micro_info)
+                # JAX dispatches the step asynchronously: fetch the next batch while the GPUs compute. With VGGT on its
+                # own GPUs, start VGGT on that batch right away; with shared GPUs, wait for the train step to finish so
+                # the two models do not compete for the same GPUs.
+                next_host_batch = None
+                if has_next_batch:
+                    load_start = time.perf_counter()
+                    batch, next_host_batch = next(data_iter)
+                    data_load_s += time.perf_counter() - load_start
+                    if not shared_align_devices:
+                        align_worker.submit(next_host_batch[0], reference_tokens=reference_tokens)
+                        next_host_batch = None
+                jax.block_until_ready(info if accumulation_steps == 1 else micro_info)
+                # Dispatch to completion, including any part of the data fetch that outlasts the compute.
                 train_step_s += time.perf_counter() - train_start
 
                 del align_targets, align_mask, align_features
-                is_last_accumulation_micro_step = micro_step + 1 == accumulation_steps
-                if shared_align_devices and has_next_batch:
-                    if accumulation_steps > 1 and is_last_accumulation_micro_step:
-                        submit_after_update = True
+                if next_host_batch is not None:
+                    if accumulation_steps > 1 and micro_step + 1 == accumulation_steps:
+                        host_batch_after_update = next_host_batch
                     else:
-                        next_batch, next_data_load_s = load_and_submit_next_batch()
-                        data_load_s += next_data_load_s
-                if next_batch is not None:
-                    batch = next_batch
+                        align_worker.submit(next_host_batch[0], reference_tokens=reference_tokens)
 
             if accumulation_steps > 1:
                 apply_start = time.perf_counter()
@@ -487,9 +483,8 @@ def main(config: _config.TrainConfig):
                 info = jax.tree.map(jnp.mean, common_utils.stack_forest(micro_infos))
                 info.update(update_info)
 
-                if submit_after_update:
-                    batch, next_data_load_s = load_and_submit_next_batch()
-                    data_load_s += next_data_load_s
+                if host_batch_after_update is not None:
+                    align_worker.submit(host_batch_after_update[0], reference_tokens=reference_tokens)
 
             infos.append(info)
 
